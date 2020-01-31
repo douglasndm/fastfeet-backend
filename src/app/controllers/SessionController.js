@@ -12,18 +12,37 @@ class SessionController {
                 .required()
                 .min(6),
         });
-
+        ('');
         if (!(await schema.isValid(req.body))) {
             return res.status(400).json({ error: 'Validation fails' });
         }
 
         const { email, password } = req.body;
 
-        const userExists = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email } });
 
-        if (!userExists) {
-            return res.status(400).json({ error: "User didn't find" });
+        if (!user) {
+            return res.status(401).json({ error: "User didn't find" });
         }
+
+        if (!(await user.checkPassword(password))) {
+            return res.status(401).json({ error: "Password don't match" });
+        }
+
+        const { id, name } = user;
+
+        return res.json({
+            user: {
+                id,
+                name,
+                email,
+            },
+            token: jwt.sign(
+                { id, name },
+                'AAAAAAAAAAAAAAAAAAAKLKLASDKÇASLDK123123',
+                { expiresIn: '30d' }
+            ),
+        });
     }
 }
 
