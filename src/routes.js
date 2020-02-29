@@ -7,6 +7,7 @@ import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
 import RecipientController from './app/controllers/RecipientController';
 import DeliverersController from './app/controllers/DeliverersController';
+import PackagesController from './app/controllers/PackagesController';
 import FileController from './app/controllers/FileController';
 
 import AuthMiddleware from './app/middlewares/Auth';
@@ -30,6 +31,10 @@ routes.get('/deliverers', DeliverersController.index);
 routes.post('/deliverers', DeliverersController.store);
 routes.put('/deliverers/:id', DeliverersController.update);
 routes.delete('/deliverers/:id', DeliverersController.delete);
+
+routes.get('/packages', PackagesController.index);
+routes.post('/packages', PackagesController.store);
+routes.put('/packages', PackagesController.update);
 
 routes.post('/files', upload.single('file'), (req, res) => {
     console.log(req.file);
