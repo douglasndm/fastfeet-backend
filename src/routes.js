@@ -36,6 +36,8 @@ routes.get('/packages', PackagesController.index);
 routes.post('/packages', PackagesController.store);
 routes.put('/packages', PackagesController.update);
 
+routes.get('/deliveryman/:deliveryman_id/deliveries', PackagesController.index);
+
 routes.post('/files', upload.single('file'), (req, res) => {
     console.log(req.file);
     return res.json(req.file);

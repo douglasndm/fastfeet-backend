@@ -4,6 +4,26 @@ import Package from '../models/Package';
 
 class PackagesController {
     async index(req, res) {
+        const { deliveryman_id } = req.params;
+
+        if (deliveryman_id) {
+            const packages = await Package.findAll({
+                where: { deliveryman_id },
+            });
+
+            const { delivered } = req.query;
+
+            if (delivered) {
+                const deliveredPackages = packages.map(function(p) {
+                    return p.end_date !== null ? p : null;
+                });
+
+                return res.json(deliveredPackages);
+            }
+
+            return res.json(packages);
+        }
+
         const packages = await Package.findAll();
 
         return res.json(packages);
