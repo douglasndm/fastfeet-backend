@@ -50,7 +50,13 @@ class PackagesController {
     }
 
     async update(req, res) {
-        const { package_id } = req.query;
+        const { deliveryman_id, package_id } = req.params;
+
+        if (!deliveryman_id) {
+            return res
+                .status(401)
+                .json({ error: 'You should provider a deliveryman id' });
+        }
 
         if (!package_id) {
             return res.status(400).json({ error: 'Package ID is required' });
@@ -71,6 +77,25 @@ class PackagesController {
         }
 
         const end_time = parseISO(req.body.end_date);
+
+        if (req.body.start_date) {
+            const start_date = parseISO(req.body.start_date);
+            const packagesList = await Package.findAll({
+                where: {
+                    deliveryman_id,
+                    start_date,
+                },
+            });
+
+            if (packagesList > 4) {
+                return res.status(400).json({
+                    error:
+                        'Should can not delivery more than 5 packages per day',
+                });
+            }
+
+            req.body.start_date = parseISO(req.body.start_date);
+        }
 
         if (
             isBefore(end_time, setHours(end_time, 8)) ||
