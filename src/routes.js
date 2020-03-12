@@ -36,7 +36,11 @@ routes.delete('/deliverers/:id', DeliverersController.delete);
 routes.get('/packages', PackagesController.index);
 routes.post('/packages', PackagesController.store);
 routes.put('/packages', PackagesController.update);
+
+// ROTAS RELACIONADAS A PROBLEMAS COM ENTREGA
 routes.get('/packages/:delivery_id/problems', DeliveryProblems.index);
+routes.post('/packages/:delivery_id/problems', DeliveryProblems.store);
+routes.delete('/packages/:delivery_id/problems', DeliveryProblems.delete);
 
 routes.get('/deliveryman/:deliveryman_id/deliveries', PackagesController.index);
 routes.put(

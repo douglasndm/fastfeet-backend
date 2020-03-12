@@ -1,3 +1,4 @@
+import * as Yup from 'yup';
 import DeliveryProblem from '../models/DeliveryProblem';
 import Package from '../models/Package';
 
@@ -32,6 +33,43 @@ class Delivery_Problem {
         const deliveryProblem = await DeliveryProblem.findAll();
 
         return res.status(200).json(deliveryProblem);
+    }
+
+    async store(req, res) {
+        const schema = Yup.object().shape({
+            delivery_id: Yup.number().required(),
+            description: Yup.string().required(),
+        });
+
+        if (!(await schema.isValid(req.body)))
+            return res.status(401).json({ error: 'Validations fails' });
+
+        const deliveryProblem = await DeliveryProblem.create(req.body);
+
+        return res.status(200).json(deliveryProblem);
+    }
+
+    async delete(req, res) {
+        const schema = Yup.object().shape({
+            delivery_id: Yup.number().required(),
+            description: Yup.string().required(),
+        });
+
+        if (!(await schema.isValid(req.body)))
+            return res.status(401).json({ error: 'Validations Fails' });
+
+        const problem = await DeliveryProblem.create(req.body);
+
+        const the_package = await Package.findByPk(req.body.delivery_id);
+
+        const result = await the_package.update({
+            canceled_at: Date.now(),
+        });
+
+        return res.status(200).json({
+            problem,
+            result,
+        });
     }
 }
 
