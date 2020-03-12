@@ -1,6 +1,8 @@
 import * as Yup from 'yup';
 import { isBefore, isAfter, parseISO, setHours, setMinutes } from 'date-fns';
 import Package from '../models/Package';
+import Deliveryman from '../models/Deliverer';
+import Mail from '../../lib/Mail';
 
 class PackagesController {
     async index(req, res) {
@@ -44,7 +46,19 @@ class PackagesController {
             return res.status(400).json({ error: 'Validations fails' });
         }
 
+        const deliveryman = await Deliveryman.findByPk(req.body.deliveryman_id);
+
+        if (!deliveryman) {
+            return res.status(401).json({ error: "Deliveryman didn't find" });
+        }
+
         const newPackage = await Package.create(req.body);
+
+        await Mail.sendMail({
+            to: `${deliveryman.name} <${deliveryman.email}>`,
+            subject: 'Nova encomenda',
+            text: `Olá, você tem uma nova encomenda cadastrada para entrega: ${newPackage.product}`,
+        });
 
         return res.json(newPackage);
     }
