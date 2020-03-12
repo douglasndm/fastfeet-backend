@@ -64,13 +64,7 @@ class PackagesController {
     }
 
     async update(req, res) {
-        const { deliveryman_id, package_id } = req.params;
-
-        if (!deliveryman_id) {
-            return res
-                .status(401)
-                .json({ error: 'You should provider a deliveryman id' });
-        }
+        const { deliveryman_id, package_id } = req.query;
 
         if (!package_id) {
             return res.status(400).json({ error: 'Package ID is required' });
@@ -115,9 +109,9 @@ class PackagesController {
             isBefore(end_time, setHours(end_time, 8)) ||
             isAfter(end_time, setHours(setMinutes(end_time, 0), 18))
         ) {
-            return res.send(
-                'Packages can only be delivered between 8AM to 6PM'
-            );
+            return res
+                .status(400)
+                .send('Packages can only be delivered between 8AM to 6PM');
         }
 
         const the_package = await Package.findByPk(package_id);

@@ -9,10 +9,8 @@ import RecipientController from './app/controllers/RecipientController';
 import DeliverersController from './app/controllers/DeliverersController';
 import PackagesController from './app/controllers/PackagesController';
 import DeliveryProblems from './app/controllers/DeliveryProblem';
-import FileController from './app/controllers/FileController';
 
 import AuthMiddleware from './app/middlewares/Auth';
-import Deliverer from './app/models/Deliverer';
 
 const upload = multer(multerConfing);
 
@@ -45,14 +43,12 @@ routes.delete('/packages/:delivery_id/problems', DeliveryProblems.delete);
 routes.get('/deliveryman/:deliveryman_id/deliveries', PackagesController.index);
 routes.put(
     '/deliveryman/:deliveryman_id/package/:package_id',
-    upload.single('file'),
     PackagesController.update
 );
 
 routes.get('/deliverers/problems', DeliveryProblems.index);
 
 routes.post('/files', upload.single('file'), (req, res) => {
-    console.log(req.file);
     return res.json(req.file);
 });
 
