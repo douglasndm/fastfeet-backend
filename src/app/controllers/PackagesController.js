@@ -3,6 +3,7 @@ import { isBefore, isAfter, parseISO, setHours, setMinutes } from 'date-fns';
 import Package from '../models/Package';
 import Deliveryman from '../models/Deliverer';
 import Mail from '../../lib/Mail';
+import Recipient from '../models/Recipient';
 
 class PackagesController {
     async index(req, res) {
@@ -16,9 +17,9 @@ class PackagesController {
             const { delivered } = req.query;
 
             if (delivered) {
-                const deliveredPackages = packages.map(function(p) {
-                    return p.end_date !== null ? p : null;
-                });
+                const deliveredPackages = packages.map(p =>
+                    p.end_date !== null ? p : null
+                );
 
                 return res.json(deliveredPackages);
             }
@@ -47,26 +48,31 @@ class PackagesController {
         }
 
         const deliveryman = await Deliveryman.findByPk(req.body.deliveryman_id);
+        if (!deliveryman)
+            return res.status(400).json({ error: "Deliveryman didn't find" });
 
-        if (!deliveryman) {
-            return res.status(401).json({ error: "Deliveryman didn't find" });
-        }
+        const recipient = await Recipient.findByPk(req.body.recipient_id);
+        if (!recipient)
+            return res.status(400).json({ error: "Recipient didn't found" });
 
         const newPackage = await Package.create(req.body);
 
         await Mail.sendMail({
             to: `${deliveryman.name} <${deliveryman.email}>`,
             subject: 'Nova encomenda',
-            text: `Olá, você tem uma nova encomenda cadastrada para entrega: ${newPackage.product}`,
+            text: `Olá, você tem uma nova encomenda cadastrada e já está disponível para entrega${
+                newPackage.product ? `: ${newPackage.product}` : ''
+            }`,
         });
 
         return res.json(newPackage);
     }
 
     async update(req, res) {
-        const { deliveryman_id, package_id } = req.query;
+        const { id } = req.params;
+        const { deliveryman_id } = req.query;
 
-        if (!package_id) {
+        if (!id) {
             return res.status(400).json({ error: 'Package ID is required' });
         }
 
@@ -114,35 +120,33 @@ class PackagesController {
                 .send('Packages can only be delivered between 8AM to 6PM');
         }
 
-        const the_package = await Package.findByPk(package_id);
+        const the_package = await Package.findByPk(id);
 
         if (!the_package) {
             return res.status(400).json({ error: "Package didn't find" });
         }
 
-        const updatedPackeage = await Package.update(req.body, {
-            where: { id: package_id },
-        });
+        const updatedPackeage = await the_package.update(req.body);
 
         return res.json(updatedPackeage);
     }
 
     async delete(req, res) {
-        const { package_id } = req.query;
+        const { id } = req.params;
 
-        if (!package_id) {
+        if (!id) {
             return res.status(400).json({ error: 'Package ID is required' });
         }
 
-        const the_package = await Package.findByPk(package_id);
+        const the_package = await Package.findByPk(id);
 
         if (!the_package) {
             return res.status(400).json({ error: "Package didn't find" });
         }
 
-        await Package.destroy(the_package);
+        await the_package.destroy(the_package);
 
-        return res.json({ success: true });
+        return res.json({ message: 'Package deleted' });
     }
 }
 
