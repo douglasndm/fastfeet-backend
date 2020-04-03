@@ -20,7 +20,7 @@ class RecipientController {
         });
 
         if (!(await schema.isValid(req.body))) {
-            return res.status(401).json({ error: 'Validation fails' });
+            return res.status(400).json({ error: 'Validation fails' });
         }
 
         const recipient = await Recipient.create(req.body);
@@ -61,7 +61,7 @@ class RecipientController {
         const recipient = await Recipient.findByPk(id);
 
         if (!recipient) {
-            return res.status(401).json({ error: "Recipient didn't find" });
+            return res.status(400).json({ error: "Recipient didn't find" });
         }
 
         await recipient.destroy(id);

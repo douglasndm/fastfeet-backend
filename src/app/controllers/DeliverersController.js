@@ -38,9 +38,12 @@ class DeliverersController {
             return res.status(400).json({ error: 'Validations fails' });
         }
 
-        const updatedDeliverer = await Deliverer.update(req.body, {
-            where: id,
-        });
+        const deliverer = await Deliverer.findByPk(id);
+
+        if (!deliverer)
+            return res.status(401).json({ error: "Deliverer didn't find" });
+
+        const updatedDeliverer = await deliverer.update(req.body);
 
         return res.json({ updatedDeliverer });
     }
@@ -56,7 +59,7 @@ class DeliverersController {
 
         await Deliverer.destroy({ where: { id } });
 
-        return res.json({ success: true });
+        return res.json({ message: 'Deliverer was deleted' });
     }
 }
 
