@@ -25,6 +25,17 @@ routes.put(
     DeliverymanPackage.update
 );
 
+// ROTAS RELACIONADAS A PROBLEMAS COM ENTREGA
+routes.get('/packages/:delivery_id/problems', DeliveryProblems.index);
+routes.post('/packages/:delivery_id/problems', DeliveryProblems.store);
+routes.delete('/packages/:delivery_id/problems', DeliveryProblems.delete);
+
+routes.get('/deliverers/problems', DeliveryProblems.index);
+
+routes.post('/files', upload.single('file'), (req, res) => {
+    return res.json(req.file);
+});
+
 routes.use(AuthMiddleware);
 
 routes.get('/users', UserController.index);
@@ -44,16 +55,5 @@ routes.get('/packages', PackagesController.index);
 routes.post('/packages', PackagesController.store);
 routes.put('/packages/:id', PackagesController.update);
 routes.delete('/packages/:id', PackagesController.delete);
-
-// ROTAS RELACIONADAS A PROBLEMAS COM ENTREGA
-routes.get('/packages/:delivery_id/problems', DeliveryProblems.index);
-routes.post('/packages/:delivery_id/problems', DeliveryProblems.store);
-routes.delete('/packages/:delivery_id/problems', DeliveryProblems.delete);
-
-routes.get('/deliverers/problems', DeliveryProblems.index);
-
-routes.post('/files', upload.single('file'), (req, res) => {
-    return res.json(req.file);
-});
 
 export default routes;
