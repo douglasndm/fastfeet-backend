@@ -17,7 +17,7 @@ class PackagesController {
             const { delivered } = req.query;
 
             if (delivered) {
-                const deliveredPackages = packages.map(p =>
+                const deliveredPackages = packages.filter(p =>
                     p.end_date !== null ? p : null
                 );
 

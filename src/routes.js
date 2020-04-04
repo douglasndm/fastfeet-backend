@@ -8,6 +8,7 @@ import SessionController from './app/controllers/SessionController';
 import RecipientController from './app/controllers/RecipientController';
 import DeliverersController from './app/controllers/DeliverersController';
 import PackagesController from './app/controllers/PackagesController';
+import DeliverymanPackage from './app/controllers/DeliverymanPackage';
 import DeliveryProblems from './app/controllers/DeliveryProblem';
 
 import AuthMiddleware from './app/middlewares/Auth';
@@ -17,6 +18,12 @@ const upload = multer(multerConfing);
 const routes = new Router();
 
 routes.post('/sessions', SessionController.store);
+
+routes.get('/deliveryman/:deliveryman_id/deliveries', PackagesController.index);
+routes.put(
+    '/deliveryman/:deliveryman_id/deliveries/:package_id',
+    DeliverymanPackage.update
+);
 
 routes.use(AuthMiddleware);
 
@@ -42,12 +49,6 @@ routes.delete('/packages/:id', PackagesController.delete);
 routes.get('/packages/:delivery_id/problems', DeliveryProblems.index);
 routes.post('/packages/:delivery_id/problems', DeliveryProblems.store);
 routes.delete('/packages/:delivery_id/problems', DeliveryProblems.delete);
-
-routes.get('/deliveryman/:deliveryman_id/deliveries', PackagesController.index);
-routes.put(
-    '/deliveryman/:deliveryman_id/package/:package_id',
-    PackagesController.update
-);
 
 routes.get('/deliverers/problems', DeliveryProblems.index);
 
