@@ -1,8 +1,25 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Deliverer from '../models/Deliverer';
 
 class DeliverersController {
     async index(req, res) {
+        const { q: query } = req.query;
+
+        console.log(query);
+
+        if (query) {
+            const deliveries = await Deliverer.findAll({
+                where: {
+                    name: {
+                        [Op.iLike]: `%${query}%`,
+                    },
+                },
+            });
+
+            return res.json(deliveries);
+        }
+
         const deliverers = await Deliverer.findAll();
 
         return res.json(deliverers);

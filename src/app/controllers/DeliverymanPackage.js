@@ -21,8 +21,6 @@ class DeliverymanPackage {
             return res.status(400).json({ error: 'Validation fails' });
         }
 
-        const { signature_id } = req.body;
-
         if (req.body.start_date) {
             const start_date = parseISO(req.body.start_date);
 

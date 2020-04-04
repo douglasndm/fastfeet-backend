@@ -18,7 +18,7 @@ class PackagesController {
             packages = await Package.findAll({
                 where: {
                     product: {
-                        [Op.like]: `%${query}%`,
+                        [Op.iLike]: `%${query}%`,
                     },
                 },
             });
