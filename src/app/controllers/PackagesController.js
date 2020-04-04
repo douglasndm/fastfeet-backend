@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import { isBefore, isAfter, parseISO, setHours, setMinutes } from 'date-fns';
 import Package from '../models/Package';
 import Deliveryman from '../models/Deliverer';
@@ -8,26 +9,38 @@ import Recipient from '../models/Recipient';
 class PackagesController {
     async index(req, res) {
         const { deliveryman_id } = req.params;
+        const { q: query } = req.query;
+
+        // Operador ternario, caso exista a variavel query vai buscar no banco os correspodentes, do contrário retorna tudo
+        let packages = {};
+
+        if (query)
+            packages = await Package.findAll({
+                where: {
+                    product: {
+                        [Op.like]: `%${query}%`,
+                    },
+                },
+            });
+        else packages = await Package.findAll();
 
         if (deliveryman_id) {
-            const packages = await Package.findAll({
-                where: { deliveryman_id },
-            });
+            const packagesFromADeliveryman = packages.filter(
+                p => p.deliveryman_id === deliveryman_id
+            );
 
             const { delivered } = req.query;
 
             if (delivered) {
-                const deliveredPackages = packages.filter(p =>
+                const deliveredPackages = packagesFromADeliveryman.filter(p =>
                     p.end_date !== null ? p : null
                 );
 
                 return res.json(deliveredPackages);
             }
 
-            return res.json(packages);
+            return res.json(packagesFromADeliveryman);
         }
-
-        const packages = await Package.findAll();
 
         return res.json(packages);
     }
