@@ -11,7 +11,10 @@ import PackagesController from './app/controllers/PackagesController';
 import DeliverymanPackage from './app/controllers/DeliverymanPackage';
 import DeliveryProblems from './app/controllers/DeliveryProblem';
 
+import FileControle from './app/controllers/FileController';
+
 import AuthMiddleware from './app/middlewares/Auth';
+import FileController from './app/controllers/FileController';
 
 const upload = multer(multerConfing);
 
@@ -32,9 +35,7 @@ routes.delete('/packages/:delivery_id/problems', DeliveryProblems.delete);
 
 routes.get('/deliverers/problems', DeliveryProblems.index);
 
-routes.post('/files', upload.single('file'), (req, res) => {
-    return res.json(req.file);
-});
+routes.post('/files', upload.single('file'), FileController.store);
 
 routes.use(AuthMiddleware);
 
