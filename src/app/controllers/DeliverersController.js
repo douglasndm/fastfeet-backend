@@ -1,12 +1,11 @@
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
 import Deliverer from '../models/Deliverer';
+import File from '../models/File';
 
 class DeliverersController {
     async index(req, res) {
         const { q: query } = req.query;
-
-        console.log(query);
 
         if (query) {
             const deliveries = await Deliverer.findAll({
@@ -20,7 +19,15 @@ class DeliverersController {
             return res.json(deliveries);
         }
 
-        const deliverers = await Deliverer.findAll();
+        const deliverers = await Deliverer.findAll({
+            include: [
+                {
+                    model: File,
+                    attributes: ['id', 'url', 'path'],
+                },
+            ],
+            attributes: ['id', 'name', 'email', 'avatar_id'],
+        });
 
         return res.json(deliverers);
     }
