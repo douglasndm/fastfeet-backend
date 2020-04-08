@@ -5,6 +5,7 @@ import Package from '../models/Package';
 import Deliveryman from '../models/Deliverer';
 import Mail from '../../lib/Mail';
 import Recipient from '../models/Recipient';
+import File from '../models/File';
 
 class PackagesController {
     async index(req, res) {
@@ -22,7 +23,40 @@ class PackagesController {
                     },
                 },
             });
-        else packages = await Package.findAll();
+        else
+            packages = await Package.findAll({
+                include: [
+                    {
+                        model: Deliveryman,
+                        as: 'deliveryman',
+                        attributes: ['id', 'name', 'email', 'avatar_id'],
+                        include: [
+                            {
+                                model: File,
+                                as: 'avatar',
+                            },
+                        ],
+                    },
+                    {
+                        model: Recipient,
+                        as: 'recipient',
+                        attributes: [
+                            'id',
+                            'name',
+                            'street',
+                            'number',
+                            'complement',
+                            'state',
+                            'city',
+                            'postalcode',
+                        ],
+                    },
+                    {
+                        model: File,
+                        as: 'signature',
+                    },
+                ],
+            });
 
         if (deliveryman_id) {
             const packagesFromADeliveryman = packages.filter(
